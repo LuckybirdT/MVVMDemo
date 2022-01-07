@@ -1,9 +1,10 @@
 package com.luckybirdt.mvvmdemo.base
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel(), ViewModelLifecycle {
 
@@ -44,6 +45,12 @@ abstract class BaseViewModel : ViewModel(), ViewModelLifecycle {
 
     }
 
+    protected fun launchOnUI(block: suspend CoroutineScope.() -> Unit): Job {
+        return viewModelScope.launch(Dispatchers.Main) {
+            block()
+        }
+    }
+
 }
 
 /**
@@ -51,7 +58,7 @@ abstract class BaseViewModel : ViewModel(), ViewModelLifecycle {
  */
 class ViewModelFactory(private val viewModel: BaseViewModel) : ViewModelProvider.Factory {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return viewModel as T
     }
 
